@@ -1,135 +1,537 @@
-!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8">
-  <title>Matrix Verde e Vermelha</title>
-  <style>
-    body {
-      margin: 0;
-      background: black;
-      overflow: hidden;
-      font-family: monospace;
-    }
-    canvas {
-      display: block;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ASHFALL — Zona de Quarentena</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #12140F;
+    --surface: #1C211A;
+    --surface-2: #232920;
+    --ink: #E8E4D9;
+    --ink-dim: #8B9188;
+    --rust: #C1502E;
+    --moss: #4A5D3A;
+    --line: #2C3226;
+  }
+  *{ box-sizing: border-box; }
+  html{ scroll-behavior: smooth; }
+  body{
+    margin:0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'IBM Plex Sans', sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1,h2,h3{ font-family: 'Big Shoulders Display', sans-serif; text-transform: uppercase; margin:0; }
+  .mono{ font-family: 'IBM Plex Mono', monospace; letter-spacing: 0.08em; }
 
-    /* Botão no topo central */
-    #music-btn {
-      position: fixed;
-      top: 15px;
-      left: 50%;
-      transform: translateX(-50%);
-      padding: 10px 20px;
-      border: 2px solid #0F0;
-      color: #0F0;
-      font-family: monospace;
-      font-size: 16px;
-      font-weight: bold;
-      cursor: pointer;
-      border-radius: 8px;
-      background: rgba(0, 255, 0, 0.15);
-      transition: all 0.3s ease-in-out;
-      z-index: 1000;
-      text-shadow: 0 0 8px #0F0;
-    }
+  #ash{ position:fixed; inset:0; z-index:1; pointer-events:none; opacity:0.35; }
 
-    #music-btn:hover {
-      background: rgba(0, 255, 0, 0.3);
-    }
-  </style>
+  /* ===== Fundo Matrix ===== */
+  #matrix{
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    opacity: 0.22;
+    pointer-events: none;
+  }
+
+  /* ===== Botão de música ===== */
+  #music-btn{
+    position: fixed;
+    top: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 10px 20px;
+    border: 2px solid #0F0;
+    color: #0F0;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    cursor: pointer;
+    border-radius: 8px;
+    background: rgba(0, 255, 0, 0.15);
+    transition: all 0.3s ease-in-out;
+    z-index: 1000;
+    text-shadow: 0 0 8px #0F0;
+  }
+  #music-btn:hover{ background: rgba(0, 255, 0, 0.3); }
+
+  .hero{
+    position: relative;
+    height: 92vh;
+    min-height: 560px;
+    overflow: hidden;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border-bottom: 1px solid var(--line);
+  }
+  .hero-img{
+    position:absolute; inset:0;
+    width:100%; height:100%;
+    object-fit: cover;
+    filter: grayscale(35%) contrast(1.1) brightness(0.6) sepia(15%);
+    transition: opacity 0.5s ease;
+  }
+  .hero::after{
+    content:"";
+    position:absolute; inset:0;
+    background: linear-gradient(180deg, rgba(18,20,15,0.15) 0%, rgba(18,20,15,0.55) 60%, var(--bg) 100%);
+  }
+  .hero-content{
+    position:relative; z-index:2;
+    padding: 0 6vw 5vw;
+    max-width: 900px;
+    width: 100%;
+    text-align: center;
+    margin: 0 auto;
+  }
+  .eyebrow{
+    color: var(--rust);
+    font-size: 13px;
+    letter-spacing: 0.25em;
+    margin-bottom: 14px;
+  }
+  .hero h1{
+    font-size: clamp(56px, 11vw, 148px);
+    font-weight: 800;
+    line-height: 0.85;
+    letter-spacing: -0.01em;
+    color: #0F0;
+    text-shadow: 0 0 12px #0F0, 0 0 32px #0F0, 0 0 64px rgba(0,255,0,0.4);
+    transition: color 1s ease, text-shadow 1s ease;
+  }
+  .hero p{
+    max-width: 480px;
+    color: var(--ink-dim);
+    font-size: 16px;
+    line-height: 1.6;
+    margin-top: 18px;
+  }
+
+  .sub-label{
+    color: var(--ink-dim);
+    font-size: 13px;
+    letter-spacing: 0.3em;
+    margin-top: 2px;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+
+  .stamp{
+    position: absolute;
+    top: 32px; right: 6vw;
+    z-index: 3;
+    width: 132px; height: 132px;
+    border: 3px solid var(--rust);
+    border-radius: 50%;
+    display:flex; align-items:center; justify-content:center;
+    text-align:center;
+    transform: rotate(-14deg);
+    color: var(--rust);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    line-height: 1.4;
+    opacity: 0.85;
+    mix-blend-mode: screen;
+  }
+  .stamp::before{
+    content:"";
+    position:absolute; inset:-8px;
+    border: 1px solid var(--rust);
+    border-radius: 50%;
+    opacity: 0.4;
+  }
+
+  .strip-section{ padding: 34px 0 10px; border-bottom: 1px solid var(--line); }
+  .strip-wrap{ display:flex; align-items:center; gap: 14px; padding: 0 6vw; }
+  .arrow{
+    flex: none;
+    width: 40px; height: 40px;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    color: var(--ink-dim);
+    display:flex; align-items:center; justify-content:center;
+    cursor: pointer;
+    font-size: 16px;
+    transition: 0.2s;
+  }
+  .arrow:hover{ border-color: var(--rust); color: var(--rust); }
+
+  .strip{
+    display:flex;
+    gap: 10px;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    cursor: grab;
+    padding: 4px 0 16px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--moss) transparent;
+  }
+  .strip.dragging{ cursor: grabbing; scroll-behavior: auto; }
+  .strip::-webkit-scrollbar{ height: 4px; }
+  .strip::-webkit-scrollbar-thumb{ background: var(--moss); }
+
+  .thumb{
+    flex: none;
+    width: 132px; height: 82px;
+    object-fit: cover;
+    border: 2px solid transparent;
+    opacity: 0.55;
+    filter: grayscale(40%);
+    cursor: pointer;
+    transition: 0.2s;
+    user-select: none;
+    -webkit-user-drag: none;
+  }
+  .thumb:hover{ opacity: 0.85; }
+  .thumb.active{
+    opacity: 1;
+    border-color: var(--rust);
+    filter: none;
+  }
+  .drag-hint{
+    text-align:center;
+    color: var(--ink-dim);
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    padding-bottom: 20px;
+  }
+
+  .section{ padding: 70px 6vw; }
+  .section-head{ display:flex; align-items:baseline; gap: 16px; margin-bottom: 28px; }
+  .section-head .idx{ color: var(--rust); font-size: 13px; }
+  .section-head h2{ font-size: 34px; font-weight: 800; }
+  .section-head .rule{ flex:1; height:1px; background: var(--line); }
+
+  .player{
+    position: relative;
+    max-width: 1100px;
+    margin: 0 auto;
+    aspect-ratio: 16/9;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    overflow: hidden;
+    cursor: pointer;
+  }
+  .player img, .player video{
+    position:absolute; inset:0;
+    width:100%; height:100%;
+    object-fit: cover;
+    filter: grayscale(30%) brightness(0.65);
+  }
+  .player video{ display:none; filter:none; }
+  .player.playing video{ display:block; }
+  .player.playing img{ display:none; }
+  .play-btn{
+    position:relative; z-index:2;
+    width: 84px; height:84px;
+    border-radius: 50%;
+    background: rgba(18,20,15,0.55);
+    border: 1px solid var(--rust);
+    color: var(--ink);
+    display:flex; align-items:center; justify-content:center;
+    margin: auto;
+    top: calc(50% - 42px);
+    transition: 0.2s;
+  }
+  .player:hover .play-btn{ background: var(--rust); transform: scale(1.06); }
+  .player.playing .play-btn{ display:none; }
+  .play-btn svg{ width:26px; height:26px; margin-left:4px; }
+
+  .gallery{
+    display:grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+  }
+  .gallery img{
+    width:100%; aspect-ratio: 4/3;
+    object-fit: cover;
+    filter: grayscale(30%);
+    opacity: 0;
+    animation: fadein 0.5s ease forwards;
+    cursor: pointer;
+    transition: filter 0.2s, transform 0.2s;
+  }
+  .gallery img:hover{ filter:none; transform: scale(1.02); }
+  @keyframes fadein{ to{ opacity:1; } }
+
+  .load-more-wrap{ text-align:center; margin-top: 30px; }
+  .load-more{
+    background: transparent;
+    border: 1px solid var(--rust);
+    color: var(--rust);
+    font-family: 'IBM Plex Mono', monospace;
+    letter-spacing: 0.1em;
+    font-size: 13px;
+    padding: 14px 34px;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+  .load-more:hover{ background: var(--rust); color: var(--bg); }
+  .load-more:disabled{ opacity: 0.3; cursor: default; background: transparent; color: var(--rust); }
+
+  footer{
+    text-align:center;
+    color: var(--ink-dim);
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    padding: 40px 0 60px;
+  }
+
+  @media (max-width: 720px){
+    .gallery{ grid-template-columns: repeat(2, 1fr); }
+    .stamp{ width: 96px; height:96px; top: 24px; right: 24px; font-size: 9px; }
+    .section{ padding: 50px 5vw; }
+  }
+  @media (prefers-reduced-motion: reduce){
+    html{ scroll-behavior:auto; }
+    .gallery img{ animation:none; opacity:1; }
+  }
+</style>
 </head>
 <body>
-  <canvas id="matrix"></canvas>
 
-  <!-- Música de fundo -->
-  <audio id="bg-music" loop>
-    <source src="musica.mp3" type="audio/mpeg">
-    Seu navegador não suporta áudio.
-  </audio>
+<canvas id="matrix"></canvas>
+<canvas id="ash"></canvas>
 
-  <!-- Botão -->
-  <button id="music-btn">▶ Música</button>
+<audio id="bg-music" loop>
+  <source src="musica.mp3" type="audio/mpeg">
+  Seu navegador não suporta áudio.
+</audio>
+<button id="music-btn">▶ Música</button>
 
-  <script>
-    const canvas = document.getElementById("matrix");
-    const ctx = canvas.getContext("2d");
+<section class="hero">
+  <img class="hero-img" id="heroImg" src="https://picsum.photos/id/1043/1600/1000" alt="Cena principal">
+  <div class="stamp">ZONA DE<br>QUARENTENA<br>№ 07</div>
+  <div class="hero-content">
+    <h1 id="heroName">Smashez</h1>
+    <div class="sub-label">ACERVO</div>
+  </div>
+</section>
 
-    const letters = "01ABCDEFGHIJKLMNOPQRSTUVXYZ@#$%&*";
-    const fontSize = 16;
-    let columns, drops;
+<section class="strip-section">
+  <div class="strip-wrap">
+    <button class="arrow" id="arrowLeft">◀</button>
+    <div class="strip" id="strip">
+      <img class="thumb active" src="https://picsum.photos/id/1043/300/200" data-full="https://picsum.photos/id/1043/1600/1000">
+      <img class="thumb" src="https://picsum.photos/id/1050/300/200" data-full="https://picsum.photos/id/1050/1600/1000">
+      <img class="thumb" src="https://picsum.photos/id/1053/300/200" data-full="https://picsum.photos/id/1053/1600/1000">
+      <img class="thumb" src="https://picsum.photos/id/1060/300/200" data-full="https://picsum.photos/id/1060/1600/1000">
+      <img class="thumb" src="https://picsum.photos/id/1067/300/200" data-full="https://picsum.photos/id/1067/1600/1000">
+      <img class="thumb" src="https://picsum.photos/id/1069/300/200" data-full="https://picsum.photos/id/1069/1600/1000">
+      <img class="thumb" src="https://picsum.photos/id/1074/300/200" data-full="https://picsum.photos/id/1074/1600/1000">
+    </div>
+    <button class="arrow" id="arrowRight">▶</button>
+  </div>
+  <div class="drag-hint mono">← ARRASTE COM O MOUSE →</div>
+</section>
 
-    let color = "#0F0"; // começa verde
+<section class="section" id="trailer-section">
+  <div class="section-head">
+    <span class="idx mono">REGISTRO 01</span>
+    <h2>Trailer</h2>
+    <div class="rule"></div>
+  </div>
+  <div class="player" id="player">
+    <img src="https://picsum.photos/id/1074/1200/675" alt="Capa do trailer">
+    <video id="trailerVideo" loop muted playsinline>
+      <source src="trailer.mp4" type="video/mp4">
+    </video>
+    <div class="play-btn">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+    </div>
+  </div>
+</section>
 
-    function resizeCanvas() {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
+<section class="section">
+  <div class="section-head">
+    <span class="idx mono">REGISTRO 02</span>
+    <h2>Galeria</h2>
+    <div class="rule"></div>
+  </div>
+  <div class="gallery" id="gallery"></div>
+  <div class="load-more-wrap">
+    <button class="load-more mono" id="loadMoreBtn">CARREGAR MAIS FOTOS</button>
+  </div>
+</section>
 
-      columns = Math.floor(canvas.width / fontSize);
-      drops = [];
-      for (let x = 0; x < columns; x++) {
-        drops[x] = 1;
-      }
-    }
+<footer class="mono">ASHFALL — PROJETO CONCEITUAL · SUBSTITUA PELOS SEUS PRÓPRIOS ATIVOS</footer>
 
-    resizeCanvas();
-    window.addEventListener("resize", resizeCanvas);
+<script>
+/* ===== Efeito Matrix (fundo) ===== */
+const matrixCanvas = document.getElementById('matrix');
+const mctx = matrixCanvas.getContext('2d');
+const letters = "01ABCDEFGHIJKLMNOPQRSTUVXYZ@#$%&*";
+const fontSize = 16;
+let columns, drops;
+let matrixColor = "#0F0";
 
-    function draw() {
-      ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
+function resizeMatrix(){
+  matrixCanvas.width = window.innerWidth;
+  matrixCanvas.height = window.innerHeight;
+  columns = Math.floor(matrixCanvas.width / fontSize);
+  drops = [];
+  for(let x = 0; x < columns; x++){ drops[x] = 1; }
+}
+resizeMatrix();
+window.addEventListener('resize', resizeMatrix);
 
-      ctx.fillStyle = color;
-      ctx.font = fontSize + "px monospace";
+function drawMatrix(){
+  mctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+  mctx.fillRect(0, 0, matrixCanvas.width, matrixCanvas.height);
+  mctx.fillStyle = matrixColor;
+  mctx.font = fontSize + "px monospace";
+  for(let i = 0; i < drops.length; i++){
+    const text = letters.charAt(Math.floor(Math.random() * letters.length));
+    mctx.fillText(text, i * fontSize, drops[i] * fontSize);
+    if(drops[i] * fontSize > matrixCanvas.height && Math.random() > 0.975){ drops[i] = 0; }
+    drops[i]++;
+  }
+}
+setInterval(drawMatrix, 35);
 
-      for (let i = 0; i < drops.length; i++) {
-        const text = letters.charAt(Math.floor(Math.random() * letters.length));
-        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+/* alterna cor verde/vermelho a cada 50s */
+const segundos = 50;
+const musicBtn = document.getElementById('music-btn');
+const heroName = document.getElementById('heroName');
 
-        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
-          drops[i] = 0;
-        }
-        drops[i]++;
-      }
-    }
+function applyNeon(hex, glow){
+  heroName.style.color = hex;
+  heroName.style.textShadow = `0 0 12px ${hex}, 0 0 32px ${hex}, 0 0 64px ${glow}`;
+}
+applyNeon('#0F0', 'rgba(0,255,0,0.4)');
 
-    setInterval(draw, 35);
+setInterval(() => {
+  if(matrixColor === "#0F0"){
+    matrixColor = "#F00";
+    musicBtn.style.color = "#F00";
+    musicBtn.style.borderColor = "#F00";
+    musicBtn.style.textShadow = "0 0 8px #F00";
+    musicBtn.style.background = "rgba(255, 0, 0, 0.15)";
+    applyNeon('#F00', 'rgba(255,0,0,0.4)');
+  } else {
+    matrixColor = "#0F0";
+    musicBtn.style.color = "#0F0";
+    musicBtn.style.borderColor = "#0F0";
+    musicBtn.style.textShadow = "0 0 8px #0F0";
+    musicBtn.style.background = "rgba(0, 255, 0, 0.15)";
+    applyNeon('#0F0', 'rgba(0,255,0,0.4)');
+  }
+}, segundos * 1000);
 
-    // === Alterna a cor a cada X segundos ===
-    const segundos = 50;
-    const btn = document.getElementById("music-btn");
+/* música play/pause */
+const music = document.getElementById('bg-music');
+let playing = false;
+musicBtn.addEventListener('click', () => {
+  if(!playing){
+    music.play();
+    musicBtn.textContent = "⏸ Música";
+    playing = true;
+  } else {
+    music.pause();
+    musicBtn.textContent = "▶ Música";
+    playing = false;
+  }
+});
 
-    setInterval(() => {
-      if (color === "#0F0") {
-        color = "#F00"; // vermelho
-        btn.style.color = "#F00";
-        btn.style.borderColor = "#F00";
-        btn.style.textShadow = "0 0 8px #F00";
-        btn.style.background = "rgba(255, 0, 0, 0.15)";
-      } else {
-        color = "#0F0"; // verde
-        btn.style.color = "#0F0";
-        btn.style.borderColor = "#0F0";
-        btn.style.textShadow = "0 0 8px #0F0";
-        btn.style.background = "rgba(0, 255, 0, 0.15)";
-      }
-    }, segundos * 1000);
+const ash = document.getElementById('ash');
+const actx = ash.getContext('2d');
+function resizeAsh(){ ash.width = innerWidth; ash.height = innerHeight; }
+resizeAsh();
+window.addEventListener('resize', resizeAsh);
+const particles = Array.from({length: 60}, () => ({
+  x: Math.random()*innerWidth,
+  y: Math.random()*innerHeight,
+  r: Math.random()*1.6 + 0.4,
+  s: Math.random()*0.4 + 0.1
+}));
+function drawAsh(){
+  actx.clearRect(0,0,ash.width,ash.height);
+  actx.fillStyle = '#E8E4D9';
+  particles.forEach(p=>{
+    actx.globalAlpha = Math.random()*0.5 + 0.1;
+    actx.beginPath();
+    actx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+    actx.fill();
+    p.y -= p.s;
+    p.x += Math.sin(p.y*0.01)*0.2;
+    if(p.y < -10){ p.y = innerHeight + 10; p.x = Math.random()*innerWidth; }
+  });
+  requestAnimationFrame(drawAsh);
+}
+drawAsh();
 
-    // Música com botão play/pause
-    const music = document.getElementById("bg-music");
-    let playing = false;
+const heroImg = document.getElementById('heroImg');
+const strip = document.getElementById('strip');
+const thumbs = strip.querySelectorAll('.thumb');
 
-    btn.addEventListener("click", () => {
-      if (!playing) {
-        music.play();
-        btn.textContent = "⏸ Música";
-        playing = true;
-      } else {
-        music.pause();
-        btn.textContent = "▶ Música";
-        playing = false;
-      }
-    });
-  </script>
+thumbs.forEach(t => {
+  t.addEventListener('click', () => {
+    thumbs.forEach(x => x.classList.remove('active'));
+    t.classList.add('active');
+    heroImg.style.opacity = 0;
+    setTimeout(()=>{ heroImg.src = t.dataset.full; heroImg.style.opacity = 1; }, 200);
+  });
+});
+
+document.getElementById('arrowLeft').onclick = () => strip.scrollBy({left: -300, behavior:'smooth'});
+document.getElementById('arrowRight').onclick = () => strip.scrollBy({left: 300, behavior:'smooth'});
+
+let isDown = false, startX, scrollLeft;
+strip.addEventListener('mousedown', e => {
+  isDown = true;
+  strip.classList.add('dragging');
+  startX = e.pageX - strip.offsetLeft;
+  scrollLeft = strip.scrollLeft;
+});
+['mouseleave','mouseup'].forEach(ev => strip.addEventListener(ev, () => {
+  isDown = false;
+  strip.classList.remove('dragging');
+}));
+strip.addEventListener('mousemove', e => {
+  if(!isDown) return;
+  e.preventDefault();
+  const x = e.pageX - strip.offsetLeft;
+  strip.scrollLeft = scrollLeft - (x - startX) * 1.4;
+});
+
+const player = document.getElementById('player');
+const video = document.getElementById('trailerVideo');
+player.addEventListener('click', () => {
+  player.classList.add('playing');
+  video.play().catch(()=>{ /* sem arquivo de vídeo ainda: troque trailer.mp4 pelo seu */ });
+});
+
+const gallery = document.getElementById('gallery');
+const loadMoreBtn = document.getElementById('loadMoreBtn');
+const galleryIds = [1043,1050,1053,1060,1067,1069,1074,1080,1084,1074,1069,1067,1060,1053,1050,1043,1084,1080,1069,1074];
+let loaded = 0;
+const BATCH = 8;
+
+function loadBatch(){
+  const next = galleryIds.slice(loaded, loaded + BATCH);
+  next.forEach((id, i) => {
+    const img = document.createElement('img');
+    img.src = `https://picsum.photos/id/${id}/500/380?_=${loaded+i}`;
+    img.style.animationDelay = (i*0.05)+'s';
+    gallery.appendChild(img);
+  });
+  loaded += next.length;
+  if(loaded >= galleryIds.length){
+    loadMoreBtn.disabled = true;
+    loadMoreBtn.textContent = 'FIM DO ARQUIVO';
+  }
+}
+loadMoreBtn.addEventListener('click', loadBatch);
+loadBatch();
+</script>
+
 </body>
 </html>

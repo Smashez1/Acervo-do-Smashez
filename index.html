@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Matrix Hacker Full</title>  
+
+<script src="https://kit.fontawesome.com/yourcode.js" crossorigin="anonymous"></script>
+<style>
+  :root { --accent: #0F0; }
+
+  
+  #smashez-nick {
+  font-size: 32px;
+  font-weight: bold;
+  color: var(--accent);
+  text-align: center;
+  animation: glow 2.5s infinite;
+  transform: translateY(-9px);
+}
+
+@keyframes glow {
+  0% { text-shadow: 0 0 2px var(--accent); }
+  50% { text-shadow: 0 0 8px var(--accent), 0 0 4px #fff; }
+  100% { text-shadow: 0 0 2px var(--accent); }
+}
+
+body {
+  margin: 0;
+  background: black;
+  overflow: hidden;
+  font-family: monospace;
+}
+
+/* 🔐 LOGIN HACKER */
+#login-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: black;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+#terminal {
+  color: var(--accent);
+  font-size: 14px;
+  white-space: pre-wrap;
+}
+
+/* MATRIX */
+canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+}
+
+/* BOTÕES */
+#music-btn, #next-btn {
+  position: fixed;
+  top: 15px;
+  padding: 10px 20px;
+  border: 2px solid var(--accent);
+  color: var(--accent);
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  border-radius: 8px;
+  background: rgba(0,0,0,0.3);
+  z-index: 1000;
+}
+
+#music-btn { left: 50%; transform: translateX(-110%); }
+#next-btn { left: 50%; transform: translateX(10%); }
+
+/* 🔊 VOLUME */
+#volume-container {
+  position: fixed;
+  top: 15px;
+  left: 50%;
+  transform: translateX(140%);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  z-index: 1000;
+}
+
+#volume-icon {
+  color: var(--accent);
+  font-size: 18px;
+}
+
+#volume-slider {
+  width: 100px;
+  cursor: pointer;
+}
+
+/* PERFIL */
+#links-panel {
+  position: fixed;
+  top: 42%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.profile-container {
+  position: relative;
+  width: 360px;
+  height: 210px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 0 20px var(--accent);
+  margin-bottom: 39px; /* espaço abaixo do painel */
+}
+
+.profile-banner {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profile-img {
+  position: absolute;
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  border: 3px solid var(--accent);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* LINKS */
+#links-panel a {
+  color: var(--accent);
+  text-decoration: none;
+  border: 1px solid var(--accent);
+  padding: 8px 12px;
+  border-radius: 6px;
+  min-width: 200px;
+  text-align: center;
+  transition: 0.3s;
+}
+
+/* 🔥 EFEITO NEON */
+#links-panel a:hover {
+  color: #fff;
+  box-shadow: 0 0 10px var(--accent),
+              0 0 20px var(--accent),
+              0 0 40px var(--accent);
+  text-shadow: 0 0 5px #fff,
+               0 0 10px var(--accent);
+  transform: scale(1.05);
+}
+
+#chat-box {
+  position: fixed;
+  left: 20px;
+  bottom: 20px;
+  width: 320px;
+  height: 240px;
+  border: 1px solid var(--accent);
+
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  border-radius: 8px;
+}
+
+#chat-header {
+  color: var(--accent);
+  padding: 5px;
+}
+
+#chat-messages {
+  height: 200px;
+  overflow-y: auto;
+  font-size: 12px;
+}
+
+.msg {
+  margin: 4px;
+  color: #FFF;
+  text-shadow: 0 0 3px rgba(255,255,255,0.3);
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- 🔐 LOGIN HACKER -->
+<div id="login-screen">
+  <pre id="terminal"></pre>
+</div>
+
+<canvas id="matrix"></canvas>
+
+<audio id="bg-music"></audio>
+
+<button id="music-btn">▶ Música</button>
+<button id="next-btn">⏭ Pular</button>
+
+<!-- 🔊 VOLUME -->
+<div id="volume-container">
+  <span id="volume-icon">🔊</span>
+  <input type="range" id="volume-slider" min="0" max="1" step="0.01">
+</div>
+
+<div id="links-panel">
+  <div class="profile-container">
+    <img src="banner.gif" class="profile-banner">
+    <img src="minha-foto.jpg" class="profile-img">
+  </div>
+  
+<!-- 🔥 COLOCA AQUI -->
+<div id="smashez-nick">Smashez</div>
+
+  <a href="https://www.youtube.com/@SmashezLive" target="_blank">
+  <img src="https://cdn-icons-png.flaticon.com/512/1384/1384060.png" width="20">
+  YouTube
+</a>
+
+<a href="https://x.com/Smaashez" target="_blank">
+  <img src="https://cdn-icons-png.flaticon.com/512/733/733579.png" width="20">
+  Twitter
+</a>
+
+<a href="https://www.twitch.tv/smashez0" target="_blank">
+  <img src="https://cdn-icons-png.flaticon.com/512/2111/2111668.png" width="20">
+  Twitch
+</a>
+
+<a href="https://kick.com/smashez" target="_blank">
+  Kick
+</a>
+
+</div>
+
+<div id="chat-box">
+  <div id="chat-header">Chat</div>
+  <div id="chat-messages"></div>
+</div>
+
+<script>
+// 🔐 LOGIN HACKER SCRIPT
+const terminal = document.getElementById("terminal");
+
+const lines = [
+  "Iniciando sistema...",
+  "Conectando ao servidor...",
+  "Bypass firewall...",
+  "Acessando banco de dados...",
+  "Usuário encontrado: admin",
+  "Quebrando senha...",
+  "Senha descoberta: ********",
+  "Autenticando...",
+  "ACESSO LIBERADO ✔"
+];
+
+let lineIndex = 0;
+let charIndex = 0;
+
+function typeEffect() {
+  if (lineIndex < lines.length) {
+    if (charIndex < lines[lineIndex].length) {
+      terminal.textContent += lines[lineIndex].charAt(charIndex);
+      charIndex++;
+      setTimeout(typeEffect, 40);
+    } else {
+      terminal.textContent += "\n";
+      lineIndex++;
+      charIndex = 0;
+      setTimeout(typeEffect, 300);
+    }
+  } else {
+    setTimeout(() => {
+      document.getElementById("login-screen").style.display = "none";
+    }, 1000);
+  }
+}
+
+typeEffect();
+
+// MATRIX
+const canvas = document.getElementById("matrix");
+const ctx = canvas.getContext("2d");
+
+function resize() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+resize();
+window.addEventListener("resize", resize);
+
+const letters = "01ABCDEFGHIJKLMNOPQRSTUVWXYZ@#$%&*";
+const fontSize = 16;
+let columns = canvas.width / fontSize;
+let drops = Array(Math.floor(columns)).fill(1);
+
+let color = "#0F0";
+
+function draw() {
+  ctx.fillStyle = "rgba(0,0,0,0.05)";
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+
+  ctx.fillStyle = color;
+  ctx.font = fontSize + "px monospace";
+
+  for (let i = 0; i < drops.length; i++) {
+    const text = letters[Math.floor(Math.random()*letters.length)];
+    ctx.fillText(text, i*fontSize, drops[i]*fontSize);
+
+    if (drops[i]*fontSize > canvas.height && Math.random() > 0.975) {
+      drops[i] = 0;
+    }
+    drops[i]++;
+  }
+}
+setInterval(draw, 50);
+
+// TROCA COR
+setInterval(() => {
+  color = (color === "#0F0") ? "#F00" : "#0F0";
+  document.documentElement.style.setProperty('--accent', color);
+}, 40000);
+
+// PLAYLIST
+const playlist = ["musica1.mp3","musica2.mp3","musica3.mp3","musica4.mp3","musica5.mp3","musica6.mp3","musica7.mp3","musica8.mp3"];
+let currentTrack = 0;
+
+const player = document.getElementById("bg-music");
+const btn = document.getElementById("music-btn");
+const nextBtn = document.getElementById("next-btn");
+
+player.src = playlist[currentTrack];
+
+let playing = false;
+
+btn.addEventListener("click", async () => {
+  if (!playing) {
+    await player.play();
+    btn.textContent = "⏸ Música";
+    playing = true;
+  } else {
+    player.pause();
+    btn.textContent = "▶ Música";
+    playing = false;
+  }
+});
+
+function nextTrack() {
+  currentTrack = (currentTrack + 1) % playlist.length;
+  player.src = playlist[currentTrack];
+  if (playing) player.play();
+}
+
+nextBtn.addEventListener("click", nextTrack);
+player.addEventListener("ended", nextTrack);
+
+ /* ====== CHAT AUTOMÁTICO (seu script + mais falas) ====== */
+    const mensagens = [
+      "<b>Neo:</b> Estou dentro da Matrix...",
+      "<b>Trinity:</b> Siga-me!",
+      "<b>Morpheus:</b> A pílula vermelha ou azul?",
+      "<b>Agente Smith:</b> Sr. Anderson...",
+      "<b>Oracle:</b> Tudo tem um propósito.",
+      "<b>Veganos:</b> Gostei da música, qual o nome?",
+      "<b>Silva:</b> mandei na sua DM do Insta",
+      "<b>Ju:</b> @Smashesz te amo meu lindo ><",
+      "<b>Roberta:</b> Vou te mandar pelo LivePix",
+      "<b>vaginaldo:</b> alguma menina no chat?. to carente y-y",
+      "<b>Muka:</b> Essa queda de código tá insana 😂",
+      "<b>Kaelira:</b> Parece até live do Neo!",
+      "<b>Trinity:</b> Confie em mim.",
+      "<b>Eduarda:</b> Smashez seu Lindo vem jogar cmg",
+      "<b>Morpheus:</b> Eu só posso te mostrar a porta...",
+      "<b>Douglinhas:</b> Mano, essa música é braba 🔥",
+      "<b>NEGAN:</b> Vocês viram a atualização nova?",
+      "<b>Agente Smith:</b> A humanidade é um vírus.",
+      "<b>Neo:</b> Eu sei kung fu.",
+      "<b>Trinity:</b> Acredite no impossível.",
+      "<b>Morpheus:</b> A Matrix é um sistema.",
+      "<b>marcolaFPS:</b> Tá parecendo um filme isso aqui 😂",
+      "<b>Lucasmacho:</b> Que vibe, mano!",
+      "<b>Oracle:</b> O futuro não está escrito.",
+      "<b>LordGx:</b> Bora rankear mais tarde?",
+      "<b>Agente Smith:</b> É inevitável.",
+      "<b>Neo:</b> Não estou aqui para lutar com você.",
+      "<b>BrunaS2:</b> Esse chat tá muito bom kkk",
+      "<b>SophiaTk:</b> Alguém manda o link da música aí!"
+    ];
+
+    const mensagensLoop = [
+      "<b>Fuscona:</b> quero tomar pirula vermelha ",
+      "<b>mingal :</b> tem gente da matrix no chat 😂",
+      "<b>senseidasarmas:</b> manda salve salve "
+    ];
+
+// 🔊 VOLUME SCRIPT
+const volumeSlider = document.getElementById("volume-slider");
+const volumeIcon = document.getElementById("volume-icon");
+
+volumeSlider.value = 0.5;
+player.volume = 0.5;
+
+volumeSlider.addEventListener("input", () => {
+  player.volume = volumeSlider.value;
+
+  if (volumeSlider.value == 0) {
+    volumeIcon.textContent = "🔇";
+  } else if (volumeSlider.value < 0.5) {
+    volumeIcon.textContent = "🔉";
+  } else {
+    volumeIcon.textContent = "🔊";
+  }
+});
+
+    const chatBox = document.getElementById("chat-messages");
+    let index = 0;
+    let loopIndex = 0;
+
+    function addMensagem() {
+      const msg = document.createElement("div");
+      msg.classList.add("msg");
+
+      if (index < mensagens.length) {
+        msg.innerHTML = mensagens[index];
+        index++;
+      } else {
+        msg.innerHTML = mensagensLoop[loopIndex];
+        loopIndex++;
+        if (loopIndex >= mensagensLoop.length) {
+          loopIndex = 0; // reinicia o loop
+        }
+      }
+
+      chatBox.appendChild(msg);
+      chatBox.scrollTop = chatBox.scrollHeight; // rola pra baixo
+    }
+
+    // adiciona uma mensagem a cada 5 segundos
+    setInterval(addMensagem, 5000);
+  
+  </script>
+  
+</body>
+</html>

@@ -328,7 +328,7 @@
   <div class="drag-hint mono">← ARRASTE COM O MOUSE →</div>
 </section>
 
-<section class="section" id="trailer-section">
+<section class="section" id="trailer-section" style="padding-bottom:20px;">
   <div class="section-head" style="justify-content:center; text-align:center;">
     <h2>Trailer</h2>
   </div>
@@ -347,7 +347,7 @@
   </div>
 </section>
 
-<section class="section">
+<section class="section" id="galeria-section" style="padding-top:20px;">
   <div class="section-head">
     <span class="idx mono">REGISTRO 02</span>
     <h2>Galeria</h2>
@@ -426,17 +426,38 @@ setInterval(() => {
 /* música play/pause */
 const music = document.getElementById('bg-music');
 let playing = false;
-musicBtn.addEventListener('click', () => {
-  if(!playing){
-    music.play();
+
+function startMusic(){
+  if(playing) return;
+  music.play().then(() => {
     musicBtn.textContent = "⏸ Música";
     playing = true;
+  }).catch(() => { /* autoplay bloqueado pelo navegador, aguarda interação */ });
+}
+
+musicBtn.addEventListener('click', () => {
+  if(!playing){
+    startMusic();
   } else {
     music.pause();
     musicBtn.textContent = "▶ Música";
     playing = false;
   }
 });
+
+/* tenta tocar assim que a página carrega */
+window.addEventListener('DOMContentLoaded', startMusic);
+
+/* se o navegador bloquear o autoplay, inicia no primeiro clique/toque em qualquer lugar da página */
+function unlockOnFirstInteraction(){
+  startMusic();
+  document.removeEventListener('click', unlockOnFirstInteraction);
+  document.removeEventListener('touchstart', unlockOnFirstInteraction);
+  document.removeEventListener('keydown', unlockOnFirstInteraction);
+}
+document.addEventListener('click', unlockOnFirstInteraction);
+document.addEventListener('touchstart', unlockOnFirstInteraction);
+document.addEventListener('keydown', unlockOnFirstInteraction);
 
 const ash = document.getElementById('ash');
 const actx = ash.getContext('2d');

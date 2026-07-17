@@ -40,12 +40,10 @@
     pointer-events: none;
   }
 
-  /* ===== Botão de música ===== */
-  #music-btn{
+  /* ===== Botões de música ===== */
+  #music-btn, #next-btn{
     position: fixed;
     top: 15px;
-    left: 50%;
-    transform: translateX(-50%);
     padding: 10px 20px;
     border: 2px solid #0F0;
     color: #0F0;
@@ -60,7 +58,9 @@
     z-index: 1000;
     text-shadow: 0 0 8px #0F0;
   }
-  #music-btn:hover{ background: rgba(0, 255, 0, 0.3); }
+  #music-btn{ left: 50%; transform: translateX(calc(-50% - 65px)); }
+  #next-btn{ left: 50%; transform: translateX(calc(-50% + 65px)); padding: 10px 16px; }
+  #music-btn:hover, #next-btn:hover{ background: rgba(0, 255, 0, 0.3); }
 
   .hero{
     position: relative;
@@ -301,11 +301,11 @@
 <canvas id="matrix"></canvas>
 <canvas id="ash"></canvas>
 
-<audio id="bg-music" loop>
-  <source src="mp3/musica1.mp3" type="audio/mpeg">
+<audio id="bg-music">
   Seu navegador não suporta áudio.
 </audio>
 <button id="music-btn">▶ Música</button>
+<button id="next-btn">⏭</button>
 
 <section class="hero">
   <img class="hero-img" id="heroImg" src="https://picsum.photos/id/1043/1600/1000" alt="Cena principal">
@@ -423,9 +423,29 @@ setInterval(() => {
   }
 }, segundos * 1000);
 
-/* música play/pause */
+/* música play/pause + playlist */
 const music = document.getElementById('bg-music');
+const nextBtn = document.getElementById('next-btn');
 let playing = false;
+
+const playlist = [
+  "mp3/musica1.mp3",
+  "mp3/musica2.mp3",
+  "mp3/musica3.mp3",
+  "mp3/musica4.mp3",
+  "mp3/musica5.mp3",
+  "mp3/musica6.mp3",
+  "mp3/musica7.mp3",
+  "mp3/musica8.mp3"
+];
+let currentTrack = 0;
+music.src = playlist[currentTrack];
+
+function nextTrack(){
+  currentTrack = (currentTrack + 1) % playlist.length;
+  music.src = playlist[currentTrack];
+  if(playing) music.play().catch(() => {});
+}
 
 function startMusic(){
   if(playing) return;
@@ -444,6 +464,9 @@ musicBtn.addEventListener('click', () => {
     playing = false;
   }
 });
+
+nextBtn.addEventListener('click', nextTrack);
+music.addEventListener('ended', nextTrack);
 
 /* tenta tocar assim que a página carrega */
 window.addEventListener('DOMContentLoaded', startMusic);

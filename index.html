@@ -150,7 +150,7 @@
   }
 
   .strip-section{ padding: 34px 0 10px; border-bottom: 1px solid var(--line); }
-  .strip-wrap{ display:flex; align-items:center; gap: 14px; padding: 0 6vw; }
+  .strip-wrap{ display:flex; align-items:center; justify-content:center; gap: 14px; padding: 0 6vw; }
   .arrow{
     flex: none;
     width: 40px; height: 40px;
@@ -309,11 +309,6 @@
 
 <section class="hero">
   <img class="hero-img" id="heroImg" src="https://picsum.photos/id/1043/1600/1000" alt="Cena principal">
-  <div class="stamp">ZONA DE<br>QUARENTENA<br>№ 07</div>
-  <div class="hero-content">
-    <h1 id="heroName">Smashez</h1>
-    <div class="sub-label">ACERVO</div>
-  </div>
 </section>
 
 <section class="strip-section">
@@ -334,10 +329,8 @@
 </section>
 
 <section class="section" id="trailer-section">
-  <div class="section-head">
-    <span class="idx mono">REGISTRO 01</span>
+  <div class="section-head" style="justify-content:center; text-align:center;">
     <h2>Trailer</h2>
-    <div class="rule"></div>
   </div>
   <div class="player" id="player">
     <img src="https://picsum.photos/id/1074/1200/675" alt="Capa do trailer">
@@ -347,6 +340,10 @@
     <div class="play-btn">
       <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
     </div>
+  </div>
+  <div class="hero-content" style="margin-top:24px;">
+    <h1 id="heroName" style="font-size:clamp(32px,6vw,64px);">Smashez</h1>
+    <div class="sub-label">ACERVO</div>
   </div>
 </section>
 

@@ -150,7 +150,12 @@
   }
 
   .strip-section{ padding: 34px 0 10px; border-bottom: 1px solid var(--line); }
-  .strip-wrap{ display:flex; align-items:center; justify-content:center; gap: 14px; padding: 0 6vw; }
+  .strip-wrap{
+    display:flex; align-items:center; justify-content:center; gap: 14px; padding: 10px 6vw;
+    border: 1px solid rgba(0,255,0,0.35);
+    box-shadow: 0 0 4px rgba(0,255,0,0.25), inset 0 0 4px rgba(0,255,0,0.12);
+    transition: border-color 0.4s ease, box-shadow 0.4s ease;
+  }
   .arrow{
     flex: none;
     width: 40px; height: 40px;
@@ -216,9 +221,11 @@
     margin: 0 auto;
     aspect-ratio: 16/9;
     background: var(--surface);
-    border: 1px solid var(--line);
+    border: 1px solid #0F0;
+    box-shadow: 0 0 6px #0F0, 0 0 14px rgba(0,255,0,0.4), inset 0 0 6px rgba(0,255,0,0.25);
     overflow: hidden;
     cursor: pointer;
+    transition: border-color 0.4s ease, box-shadow 0.4s ease;
   }
   .player img, .player video{
     position:absolute; inset:0;
@@ -264,18 +271,37 @@
 
   .load-more-wrap{ text-align:center; margin-top: 30px; }
   .load-more{
-    background: transparent;
-    border: 1px solid var(--rust);
-    color: var(--rust);
+    position: relative;
+    overflow: hidden;
+    background: rgba(0,255,0,0.06);
+    border: 1px solid #0F0;
+    color: #0F0;
+    text-shadow: 0 0 6px #0F0;
+    box-shadow: 0 0 6px rgba(0,255,0,0.35), inset 0 0 8px rgba(0,255,0,0.15);
     font-family: 'IBM Plex Mono', monospace;
     letter-spacing: 0.1em;
     font-size: 13px;
     padding: 14px 34px;
     cursor: pointer;
-    transition: 0.2s;
+    transition: border-color 0.4s ease, box-shadow 0.4s ease, color 0.4s ease, background 0.2s ease;
   }
-  .load-more:hover{ background: var(--rust); color: var(--bg); }
-  .load-more:disabled{ opacity: 0.3; cursor: default; background: transparent; color: var(--rust); }
+  .load-more:hover{ background: rgba(0,255,0,0.16); }
+  .load-more:disabled{ opacity: 0.3; cursor: default; background: transparent; }
+  .load-more .neon-ripple{
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: currentColor;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .load-more.neon-tap .neon-ripple{
+    animation: neonTap 0.5s ease-out;
+  }
+  @keyframes neonTap{
+    0%{ opacity: 0.55; }
+    100%{ opacity: 0; }
+  }
 
   footer{
     text-align:center;
@@ -294,6 +320,26 @@
     html{ scroll-behavior:auto; }
     .gallery img{ animation:none; opacity:1; }
   }
+  /* ===== Text Cursor Trail ===== */
+  .cursor-word{
+    position: fixed;
+    top: 0; left: 0;
+    pointer-events: none;
+    z-index: 9999;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+    color: #0F0;
+    text-shadow: 0 0 6px #0F0, 0 0 12px rgba(0,255,0,0.5);
+    animation: cursorWordFade 0.9s ease-out forwards;
+    will-change: transform, opacity;
+  }
+  @keyframes cursorWordFade{
+    0%{ opacity: 0.9; transform: translate(-50%, -50%) translateY(0) scale(1); }
+    100%{ opacity: 0; transform: translate(-50%, -50%) translateY(-18px) scale(0.85); }
+  }
 </style>
 </head>
 <body>
@@ -308,20 +354,20 @@
 <button id="next-btn">⏭</button>
 
 <section class="hero">
-  <img class="hero-img" id="heroImg" src="https://picsum.photos/id/1043/1600/1000" alt="Cena principal">
+  <img class="hero-img" id="heroImg" src="fotos/foto1.jpg" alt="Cena principal">
 </section>
 
 <section class="strip-section">
-  <div class="strip-wrap">
+  <div class="strip-wrap" id="stripPanel">
     <button class="arrow" id="arrowLeft">◀</button>
     <div class="strip" id="strip">
-      <img class="thumb active" src="https://picsum.photos/id/1043/300/200" data-full="https://picsum.photos/id/1043/1600/1000">
-      <img class="thumb" src="https://picsum.photos/id/1050/300/200" data-full="https://picsum.photos/id/1050/1600/1000">
-      <img class="thumb" src="https://picsum.photos/id/1053/300/200" data-full="https://picsum.photos/id/1053/1600/1000">
-      <img class="thumb" src="https://picsum.photos/id/1060/300/200" data-full="https://picsum.photos/id/1060/1600/1000">
-      <img class="thumb" src="https://picsum.photos/id/1067/300/200" data-full="https://picsum.photos/id/1067/1600/1000">
-      <img class="thumb" src="https://picsum.photos/id/1069/300/200" data-full="https://picsum.photos/id/1069/1600/1000">
-      <img class="thumb" src="https://picsum.photos/id/1074/300/200" data-full="https://picsum.photos/id/1074/1600/1000">
+      <img class="thumb active" src="fotos/foto1.jpg" data-full="fotos/foto1.jpg" data-track="0">
+      <img class="thumb" src="fotos/foto2.jpg" data-full="fotos/foto2.jpg" data-track="1">
+      <img class="thumb" src="fotos/foto3.jpg" data-full="fotos/foto3.jpg" data-track="2">
+      <img class="thumb" src="fotos/foto4.jpg" data-full="fotos/foto4.jpg" data-track="3">
+      <img class="thumb" src="fotos/foto5.jpg" data-full="fotos/foto5.jpg" data-track="4">
+      <img class="thumb" src="fotos/foto6.jpg" data-full="fotos/foto6.jpg" data-track="5">
+      <img class="thumb" src="fotos/foto7.jpg" data-full="fotos/foto7.jpg" data-track="6">
     </div>
     <button class="arrow" id="arrowRight">▶</button>
   </div>
@@ -333,9 +379,9 @@
     <h2>Trailer</h2>
   </div>
   <div class="player" id="player">
-    <img src="https://picsum.photos/id/1074/1200/675" alt="Capa do trailer">
+    <img src="trailer/capa.jpg" alt="Capa do trailer">
     <video id="trailerVideo" loop muted playsinline>
-      <source src="trailer.mp4" type="video/mp4">
+      <source src="trailer/trailer.mp4" type="video/mp4">
     </video>
     <div class="play-btn">
       <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
@@ -348,14 +394,12 @@
 </section>
 
 <section class="section" id="galeria-section" style="padding-top:20px;">
-  <div class="section-head">
-    <span class="idx mono">REGISTRO 02</span>
+  <div class="section-head" style="justify-content:center; text-align:center;">
     <h2>Galeria</h2>
-    <div class="rule"></div>
   </div>
   <div class="gallery" id="gallery"></div>
   <div class="load-more-wrap">
-    <button class="load-more mono" id="loadMoreBtn">CARREGAR MAIS FOTOS</button>
+    <button class="load-more mono" id="loadMoreBtn">CARREGAR MAIS FOTOS<span class="neon-ripple"></span></button>
   </div>
 </section>
 
@@ -397,7 +441,11 @@ setInterval(drawMatrix, 35);
 /* alterna cor verde/vermelho a cada 50s */
 const segundos = 50;
 const musicBtn = document.getElementById('music-btn');
+const nextBtn = document.getElementById('next-btn');
 const heroName = document.getElementById('heroName');
+const playerPanel = document.getElementById('player');
+const stripPanel = document.getElementById('stripPanel');
+const loadMoreNeon = document.getElementById('loadMoreBtn');
 
 function applyNeon(hex, glow){
   heroName.style.color = hex;
@@ -412,6 +460,19 @@ setInterval(() => {
     musicBtn.style.borderColor = "#F00";
     musicBtn.style.textShadow = "0 0 8px #F00";
     musicBtn.style.background = "rgba(255, 0, 0, 0.15)";
+    nextBtn.style.color = "#F00";
+    nextBtn.style.borderColor = "#F00";
+    nextBtn.style.textShadow = "0 0 8px #F00";
+    nextBtn.style.background = "rgba(255, 0, 0, 0.15)";
+    playerPanel.style.borderColor = "#F00";
+    playerPanel.style.boxShadow = "0 0 6px #F00, 0 0 14px rgba(255,0,0,0.4), inset 0 0 6px rgba(255,0,0,0.25)";
+    stripPanel.style.borderColor = "rgba(255,0,0,0.35)";
+    stripPanel.style.boxShadow = "0 0 4px rgba(255,0,0,0.25), inset 0 0 4px rgba(255,0,0,0.12)";
+    loadMoreNeon.style.borderColor = "#F00";
+    loadMoreNeon.style.color = "#F00";
+    loadMoreNeon.style.textShadow = "0 0 6px #F00";
+    loadMoreNeon.style.boxShadow = "0 0 6px rgba(255,0,0,0.35), inset 0 0 8px rgba(255,0,0,0.15)";
+    loadMoreNeon.style.background = "rgba(255,0,0,0.06)";
     applyNeon('#F00', 'rgba(255,0,0,0.4)');
   } else {
     matrixColor = "#0F0";
@@ -419,13 +480,25 @@ setInterval(() => {
     musicBtn.style.borderColor = "#0F0";
     musicBtn.style.textShadow = "0 0 8px #0F0";
     musicBtn.style.background = "rgba(0, 255, 0, 0.15)";
+    nextBtn.style.color = "#0F0";
+    nextBtn.style.borderColor = "#0F0";
+    nextBtn.style.textShadow = "0 0 8px #0F0";
+    nextBtn.style.background = "rgba(0, 255, 0, 0.15)";
+    playerPanel.style.borderColor = "#0F0";
+    playerPanel.style.boxShadow = "0 0 6px #0F0, 0 0 14px rgba(0,255,0,0.4), inset 0 0 6px rgba(0,255,0,0.25)";
+    stripPanel.style.borderColor = "rgba(0,255,0,0.35)";
+    stripPanel.style.boxShadow = "0 0 4px rgba(0,255,0,0.25), inset 0 0 4px rgba(0,255,0,0.12)";
+    loadMoreNeon.style.borderColor = "#0F0";
+    loadMoreNeon.style.color = "#0F0";
+    loadMoreNeon.style.textShadow = "0 0 6px #0F0";
+    loadMoreNeon.style.boxShadow = "0 0 6px rgba(0,255,0,0.35), inset 0 0 8px rgba(0,255,0,0.15)";
+    loadMoreNeon.style.background = "rgba(0,255,0,0.06)";
     applyNeon('#0F0', 'rgba(0,255,0,0.4)');
   }
 }, segundos * 1000);
 
 /* música play/pause + playlist */
 const music = document.getElementById('bg-music');
-const nextBtn = document.getElementById('next-btn');
 let playing = false;
 
 const playlist = [
@@ -519,6 +592,17 @@ thumbs.forEach(t => {
     t.classList.add('active');
     heroImg.style.opacity = 0;
     setTimeout(()=>{ heroImg.src = t.dataset.full; heroImg.style.opacity = 1; }, 200);
+
+    /* toca a faixa de música associada a essa foto */
+    const trackIndex = parseInt(t.dataset.track, 10);
+    if(!isNaN(trackIndex) && trackIndex !== currentTrack){
+      currentTrack = trackIndex;
+      music.src = playlist[currentTrack];
+      music.play().then(() => {
+        musicBtn.textContent = "⏸ Música";
+        playing = true;
+      }).catch(() => {});
+    }
   });
 });
 
@@ -552,26 +636,61 @@ player.addEventListener('click', () => {
 
 const gallery = document.getElementById('gallery');
 const loadMoreBtn = document.getElementById('loadMoreBtn');
-const galleryIds = [1043,1050,1053,1060,1067,1069,1074,1080,1084,1074,1069,1067,1060,1053,1050,1043,1084,1080,1069,1074];
+const TOTAL_FOTOS_GALERIA = 12; /* <-- troque esse número pela quantidade real de fotos que você tem na pasta galeria/ */
 let loaded = 0;
 const BATCH = 8;
 
 function loadBatch(){
-  const next = galleryIds.slice(loaded, loaded + BATCH);
-  next.forEach((id, i) => {
+  const next = [];
+  for(let i = loaded; i < Math.min(loaded + BATCH, TOTAL_FOTOS_GALERIA); i++){
+    next.push(i + 1); /* numeração das fotos: galeria/foto1.jpg, foto2.jpg... */
+  }
+  next.forEach((num, i) => {
     const img = document.createElement('img');
-    img.src = `https://picsum.photos/id/${id}/500/380?_=${loaded+i}`;
+    img.src = `galeria/foto${num}.jpg`;
     img.style.animationDelay = (i*0.05)+'s';
     gallery.appendChild(img);
   });
   loaded += next.length;
-  if(loaded >= galleryIds.length){
+  if(loaded >= TOTAL_FOTOS_GALERIA){
     loadMoreBtn.disabled = true;
     loadMoreBtn.textContent = 'FIM DO ARQUIVO';
   }
 }
 loadMoreBtn.addEventListener('click', loadBatch);
+loadMoreBtn.addEventListener('click', () => {
+  loadMoreBtn.classList.remove('neon-tap');
+  void loadMoreBtn.offsetWidth; /* força reflow pra reiniciar a animação */
+  loadMoreBtn.classList.add('neon-tap');
+});
 loadBatch();
+
+/* ===== Text Cursor Trail ===== */
+const trailWords = ["código"];
+let trailIndex = 0;
+let lastTrailTime = 0;
+const trailInterval = 55; /* ms entre palavras, pra ficar elegante e não poluído */
+
+document.addEventListener('mousemove', (e) => {
+  const now = Date.now();
+  if(now - lastTrailTime < trailInterval) return;
+  lastTrailTime = now;
+
+  const word = document.createElement('span');
+  word.className = 'cursor-word';
+  word.textContent = trailWords[trailIndex % trailWords.length];
+  trailIndex++;
+
+  const offsetX = (Math.random() - 0.5) * 10;
+  const offsetY = (Math.random() - 0.5) * 10;
+  word.style.left = (e.clientX + offsetX) + "px";
+  word.style.top = (e.clientY + offsetY) + "px";
+  word.style.color = matrixColor;
+  word.style.textShadow = `0 0 6px ${matrixColor}, 0 0 12px ${matrixColor}`;
+
+  document.body.appendChild(word);
+  word.addEventListener('animationend', () => word.remove());
+});
 </script>
 
 </body>

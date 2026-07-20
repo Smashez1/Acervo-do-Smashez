@@ -461,6 +461,20 @@
     50%, 100%{ opacity: 0.2; }
   }
 
+  /* ===== Animação ao rolar (fade-in) ===== */
+  .reveal{
+    opacity: 0;
+    transform: translateY(36px);
+    transition: opacity 0.9s ease, transform 0.9s ease;
+  }
+  .reveal.visible{
+    opacity: 1;
+    transform: translateY(0);
+  }
+  @media (prefers-reduced-motion: reduce){
+    .reveal{ opacity: 1; transform: none; transition: none; }
+  }
+
   /* ===== Text Cursor Trail ===== */
   .cursor-word{
     position: fixed;
@@ -509,7 +523,7 @@
 </section>
 
 <section class="strip-section">
-  <div class="strip-wrap" id="stripPanel">
+  <div class="strip-wrap reveal" id="stripPanel">
     <button class="arrow" id="arrowLeft">◀</button>
     <div class="strip" id="strip">
       <img class="thumb active" src="fotos/foto1.jpg" data-full="fotos/foto1.jpg" data-track="0">
@@ -526,10 +540,10 @@
 </section>
 
 <section class="section" id="trailer-section" style="padding-bottom:20px;">
-  <div class="section-head" style="justify-content:center; text-align:center;">
+  <div class="section-head reveal" style="justify-content:center; text-align:center;">
     <h2>Trailer</h2>
   </div>
-  <div class="player" id="player">
+  <div class="player reveal" id="player">
     <img src="trailer/capa.jpg" alt="Capa do trailer">
     <video id="trailerVideo" loop muted playsinline>
       <source src="trailer/trailer.mp4" type="video/mp4">
@@ -538,23 +552,35 @@
       <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
     </div>
   </div>
-  <div class="hero-content" style="margin-top:24px;">
+  <div class="hero-content reveal" style="margin-top:24px;">
     <h1 id="heroName" data-text="Smashez" style="font-size:clamp(32px,6vw,64px);">Smashez</h1>
     <div class="sub-label">ACERVO</div>
   </div>
 </section>
 
 <section class="section" id="galeria-section" style="padding-top:20px;">
-  <div class="section-head" style="justify-content:center; text-align:center;">
+  <div class="section-head reveal" style="justify-content:center; text-align:center;">
     <h2>Galeria</h2>
   </div>
-  <div class="gallery" id="gallery"></div>
+  <div class="gallery reveal" id="gallery"></div>
   <div class="load-more-wrap">
     <button class="load-more mono" id="loadMoreBtn">CARREGAR MAIS FOTOS<span class="neon-ripple"></span></button>
   </div>
 </section>
 
 <script>
+/* ===== Animação ao rolar (fade-in) ===== */
+const revealObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if(entry.isIntersecting){
+      entry.target.classList.add('visible');
+      revealObserver.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.15 });
+
+document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
 /* ===== Tela de entrada (Glitch Intro) ===== */
 window.addEventListener('load', () => {
   const introOverlay = document.getElementById('intro-overlay');

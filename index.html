@@ -75,9 +75,27 @@
     border: 2px solid #0F0;
     border-radius: 8px;
     background: rgba(0, 255, 0, 0.15);
+    width: 48px;
+    overflow: hidden;
+    transition: width 0.35s ease, background 0.3s ease;
   }
-  #volume-icon{ color: #0F0; font-size: 16px; text-shadow: 0 0 8px #0F0; }
-  #volume-slider{ width: 100px; cursor: pointer; accent-color: #0F0; }
+  #volume-container:hover,
+  #volume-container:focus-within{
+    width: 168px;
+  }
+  #volume-icon{ color: #0F0; font-size: 16px; text-shadow: 0 0 8px #0F0; flex: none; }
+  #volume-slider{
+    width: 100px;
+    flex: none;
+    cursor: pointer;
+    accent-color: #0F0;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+  }
+  #volume-container:hover #volume-slider,
+  #volume-container:focus-within #volume-slider{
+    opacity: 1;
+  }
 
   .hero{
     position: relative;
@@ -555,13 +573,11 @@
   <div class="hero-content reveal" style="margin-top:24px;">
     <h1 id="heroName" data-text="Smashez" style="font-size:clamp(32px,6vw,64px);">Smashez</h1>
     <div class="sub-label">ACERVO</div>
+    <video src="fotos/logo.mp4" autoplay loop muted playsinline style="max-width:160px; width:100%; height:auto; margin-top:10px;"></video>
   </div>
 </section>
 
 <section class="section" id="galeria-section" style="padding-top:20px;">
-  <div style="display:flex; justify-content:center;">
-    <video src="fotos/logo.mp4" autoplay loop muted playsinline style="max-width:160px; width:100%; height:auto; margin-bottom:8px;"></video>
-  </div>
   <div class="section-head reveal" style="justify-content:center; text-align:center;">
     <h2>Galeria</h2>
   </div>
